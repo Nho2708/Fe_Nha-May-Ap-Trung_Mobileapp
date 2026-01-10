@@ -9,6 +9,10 @@ import MonitoringScreen from './components/MonitoringScreen';
 import UpdateBatchScreen from './components/UpdateBatchScreen';
 import ReportsScreen from './components/ReportsScreen';
 import AIChatScreen from './components/AIChatScreen';
+import ProductsScreen from './components/ProductsScreen';
+import ProductDetailScreen from './components/ProductDetailScreen';
+import CartScreen from './components/CartScreen';
+import CheckoutScreen from './components/CheckoutScreen';
 
 export type Screen = 
   | 'onboarding'
@@ -20,7 +24,11 @@ export type Screen =
   | 'monitoring'
   | 'updateBatch'
   | 'reports'
-  | 'aiChat';
+  | 'aiChat'
+  | 'products'
+  | 'productDetail'
+  | 'cart'
+  | 'checkout';
 
 export type Device = {
   id: string;
@@ -58,6 +66,9 @@ function App() {
     humidity: number;
     days: number;
   } | null>(null);
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [orderTotal, setOrderTotal] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -93,6 +104,7 @@ function App() {
             onScanQR={() => setCurrentScreen('scanQR')}
             onViewReports={() => setCurrentScreen('reports')}
             onOpenAIChat={() => setCurrentScreen('aiChat')}
+            onShop={() => setCurrentScreen('products')}
           />
         );
       case 'scanQR':
@@ -156,6 +168,55 @@ function App() {
         return <ReportsScreen onBack={handleBack} />;
       case 'aiChat':
         return <AIChatScreen onBack={handleBack} />;
+      case 'products':
+        return (
+          <ProductsScreen
+            onBack={handleBack}
+            onViewCart={() => setCurrentScreen('cart')}
+            onViewDetail={(product) => {
+              setSelectedProduct(product);
+              setCurrentScreen('productDetail');
+            }}
+            onAddToCart={(product) => {
+              setCartItems([...cartItems, product]);
+            }}
+          />
+        );
+      case 'productDetail':
+        return (
+          <ProductDetailScreen
+            product={selectedProduct}
+            onBack={() => setCurrentScreen('products')}
+            onAddToCart={(product, quantity) => {
+              setCartItems([...cartItems, { ...product, quantity }]);
+            }}
+            onBuyNow={(product, quantity) => {
+              setCartItems([{ ...product, quantity }]);
+              setOrderTotal(product.price * quantity);
+              setCurrentScreen('cart');
+            }}
+          />
+        );
+      case 'cart':
+        return (
+          <CartScreen
+            onBack={() => setCurrentScreen('products')}
+            onCheckout={(items, total) => {
+              setCartItems(items);
+              setOrderTotal(total);
+              setCurrentScreen('checkout');
+            }}
+          />
+        );
+      case 'checkout':
+        return (
+          <CheckoutScreen
+            onBack={() => setCurrentScreen('cart')}
+            items={cartItems}
+            total={orderTotal}
+            onComplete={handleBack}
+          />
+        );
       default:
         return <HomeScreen onSelectDevice={handleSelectDevice} onScanQR={() => setCurrentScreen('scanQR')} onViewReports={() => setCurrentScreen('reports')} onOpenAIChat={() => setCurrentScreen('aiChat')} />;
     }

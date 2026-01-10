@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, QrCode, BarChart3, MessageCircle, Thermometer, Droplets, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, QrCode, BarChart3, MessageCircle, Thermometer, Droplets, AlertCircle, CheckCircle2, Clock, ShoppingBag } from 'lucide-react';
 import type { Device, Batch } from '../App';
 
 type HomeScreenProps = {
@@ -7,6 +7,7 @@ type HomeScreenProps = {
   onScanQR: () => void;
   onViewReports: () => void;
   onOpenAIChat: () => void;
+  onShop?: () => void;
 };
 
 // Mock data
@@ -65,7 +66,7 @@ const mockDevices: Device[] = [
   },
 ];
 
-export default function HomeScreen({ onSelectDevice, onScanQR, onViewReports, onOpenAIChat }: HomeScreenProps) {
+export default function HomeScreen({ onSelectDevice, onScanQR, onViewReports, onOpenAIChat, onShop }: HomeScreenProps) {
   const [devices] = useState<Device[]>(mockDevices);
 
   const getStatusInfo = (status: Device['status']) => {
@@ -116,7 +117,7 @@ export default function HomeScreen({ onSelectDevice, onScanQR, onViewReports, on
       {/* Main content */}
       <div className="px-6 py-6 space-y-6">
         {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={onScanQR}
             className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col items-center gap-2 hover:shadow-md transition-shadow"
@@ -124,7 +125,7 @@ export default function HomeScreen({ onSelectDevice, onScanQR, onViewReports, on
             <div className="bg-blue-100 p-3 rounded-full">
               <QrCode size={24} className="text-blue-600" />
             </div>
-            <span className="font-medium">Thêm máy ấp</span>
+            <span className="font-medium text-sm">Thêm máy</span>
           </button>
           <button
             onClick={onViewReports}
@@ -133,8 +134,19 @@ export default function HomeScreen({ onSelectDevice, onScanQR, onViewReports, on
             <div className="bg-green-100 p-3 rounded-full">
               <BarChart3 size={24} className="text-green-600" />
             </div>
-            <span className="font-medium">Báo cáo</span>
+            <span className="font-medium text-sm">Báo cáo</span>
           </button>
+          {onShop && (
+            <button
+              onClick={onShop}
+              className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col items-center gap-2 hover:shadow-md transition-shadow"
+            >
+              <div className="bg-purple-100 p-3 rounded-full">
+                <ShoppingBag size={24} className="text-purple-600" />
+              </div>
+              <span className="font-medium text-sm">Mua sắm</span>
+            </button>
+          )}
         </div>
 
         {/* Devices list */}
